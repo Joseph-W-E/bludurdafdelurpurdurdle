@@ -45,7 +45,7 @@ class LetterKey extends StatelessWidget {
     final state = context.watch<GameBloc>().state;
 
     return _KeyBase(
-      color: state.getCorrectness(letter).color,
+      color: state.getCorrectness(letter).color ?? Theme.of(context).colorScheme.primary,
       child: TextButton(
         onPressed: () => context.read<GameBloc>().add(KeyPress(letter)),
         child: Text(letter.toUpperCase()),

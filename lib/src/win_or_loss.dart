@@ -31,7 +31,7 @@ class _YourDoneIt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      'your done it',
+      '⭐ your did it',
       style: Theme.of(context).textTheme.headline1?.copyWith(
             color: Colors.green,
           ),

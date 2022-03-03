@@ -13,12 +13,14 @@ class Grid extends StatelessWidget {
       ...state.guessed.map(
         (word) => Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: word.map((letter) => Cell(letter: letter)).toList(),
         ),
       ),
       if (state.pendingGuess.isNotEmpty)
         Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(state.secretWord.length, (i) {
             if (i < state.pendingGuess.length) {
               return Cell(
@@ -33,10 +35,11 @@ class Grid extends StatelessWidget {
         ),
     ];
 
-    if (children.length < GameState.maxGuesses) {
-      children.addAll(List.generate(GameState.maxGuesses - children.length, (i) {
+    if (children.length < state.maxGuesses) {
+      children.addAll(List.generate(state.maxGuesses - children.length, (i) {
         return Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(state.secretWord.length, (i) {
             return const Cell();
           }),
@@ -44,8 +47,7 @@ class Grid extends StatelessWidget {
       }));
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return ListView(
       children: children,
     );
   }
@@ -67,7 +69,7 @@ class Cell extends StatelessWidget {
       margin: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         border: Border.all(
-          color: letter?.correctness.color ?? Colors.teal.withOpacity(0.1),
+          color: letter?.correctness.color ?? Theme.of(context).colorScheme.primary,
         ),
         borderRadius: BorderRadius.circular(3),
       ),

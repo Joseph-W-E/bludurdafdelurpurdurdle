@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bludurdafdelurpurdurdle/src/words_list.dart';
 import 'package:equatable/equatable.dart';
@@ -18,7 +19,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   FutureOr<void> _onLoad(Load event, Emitter<GameState> emit) async {
     emit(
       GameState(
-        secretWord: words.first,
+        secretWord: words[Random().nextInt(words.length)].toLowerCase(),
       ),
     );
   }
@@ -43,12 +44,18 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     final result = <GuessedLetter>[];
     final guessedLetters = state.pendingGuess.split('');
     final secretLetters = state.secretWord.split('').toList();
+
+    bool _isNotExcessive(String gL) {
+      return result.where((i) => i.letter == gL).length <
+          secretLetters.where((i) => i == gL).length;
+    }
+
     for (var i = 0; i < guessedLetters.length; i++) {
       final gL = guessedLetters[i], sL = secretLetters[i];
       late Correctness correctness;
       if (gL == sL) {
         correctness = Correctness.inSpot;
-      } else if (secretLetters.contains(gL)) {
+      } else if (secretLetters.contains(gL) && _isNotExcessive(gL)) {
         correctness = Correctness.inWord;
       } else {
         correctness = Correctness.incorrect;
@@ -99,8 +106,6 @@ class EnterKeyPress extends GameEvent {}
 class DeleteKeyPress extends GameEvent {}
 
 class GameState with EquatableMixin {
-  static const maxGuesses = 5;
-
   final List<List<GuessedLetter>> guessed;
   final String pendingGuess;
   final String secretWord;
@@ -115,6 +120,8 @@ class GameState with EquatableMixin {
       guessed.isNotEmpty && guessed.last.every((gl) => gl.correctness == Correctness.inSpot);
 
   bool get isLost => !isWon && guessed.length >= maxGuesses;
+
+  int get maxGuesses => 5;
 
   @override
   List<Object?> get props => [
@@ -141,7 +148,7 @@ class GameState with EquatableMixin {
 enum Correctness { none, incorrect, inWord, inSpot }
 
 extension CorrectnessX on Correctness {
-  Color get color {
+  Color? get color {
     switch (this) {
       case Correctness.incorrect:
         return Colors.red;
@@ -150,7 +157,7 @@ extension CorrectnessX on Correctness {
       case Correctness.inSpot:
         return Colors.green;
       default:
-        return Colors.transparent;
+        return null;
     }
   }
 }
